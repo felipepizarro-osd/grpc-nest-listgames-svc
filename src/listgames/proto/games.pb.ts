@@ -14,7 +14,6 @@ export interface Game {
 }
 
 export interface CreateGameRequest {
-  id: number;
   name: string;
   backgroundImages: string;
   description: string;
