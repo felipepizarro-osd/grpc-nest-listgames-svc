@@ -53,6 +53,14 @@ export class ListgamesService implements OnModuleInit {
     const listgames: Listgames = await this.repository.findOne({
       where: { id: listId },
     });
+    if (!listgames) {
+      // Si listgames es null, la lista no fue encontrada
+      return {
+        status: HttpStatus.NOT_FOUND, // Código de estado 404 Not Found
+        error: [`List with id ${listId} not found`],
+        listId,
+      };
+    }
 
     let allOperationsSuccessful = true;
     let failedGameId = null;
@@ -66,9 +74,11 @@ export class ListgamesService implements OnModuleInit {
         if (!listgames.gamesIds.includes(game.game.id)) {
           listgames.gamesIds.push(game.game.id);
         } else {
-          console.log(
-            `Game with id ${game.game.id} already exists in the list.`,
-          );
+          return {
+            status: HttpStatus.CONFLICT, // Código de estado 409 Conflict
+            error: [`Game with id ${gameId} already exists in the list`],
+            listId: listgames.id,
+          };
         }
       } else {
         allOperationsSuccessful = false;

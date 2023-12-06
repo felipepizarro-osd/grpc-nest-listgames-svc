@@ -9,10 +9,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
-      port: 5431,
+      port: 5432,
       database: 'micro_gamelist',
-      username: 'felipepizarro',
-      password: null,
+      username: 'postgres',
+      password: "0605",
       entities: ['dist/**/*.entity.{ts,js}'],
       synchronize: true,
     }),
