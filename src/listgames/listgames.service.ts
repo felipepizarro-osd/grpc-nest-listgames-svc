@@ -106,7 +106,7 @@ export class ListgamesService implements OnModuleInit {
       this.gamesService.getGame({ id: gameId }),
     );
 
-    if (game.game !== null) {
+    if (game.game !== null && listgames.gamesIds.includes(game.game.id)) {
       listgames.gamesIds = listgames.gamesIds.filter(
         (gameId) => gameId !== game.game.id,
       );
