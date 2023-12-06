@@ -37,6 +37,12 @@ export interface GetGameResponse {
   game: Game | undefined;
 }
 
+export interface GetGamesResponse {
+  status: number;
+  games: Game[];
+  error: string[];
+}
+
 export const GAMES_PACKAGE_NAME = "games";
 
 export interface GamesServiceClient {

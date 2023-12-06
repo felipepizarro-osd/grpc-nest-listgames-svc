@@ -3,14 +3,13 @@ import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class Listgames extends BaseEntity {
   @PrimaryGeneratedColumn()
-  public id: number;
+  id: number;
 
   @Column()
-  public name: string;
+  name: string;
 
   @Column()
-  public gameid: number;
-
-  @Column()
-  public userId: number;
+  userId: number;
+  @Column('int', { array: true, default: [] })
+  gamesIds: number[];
 }
