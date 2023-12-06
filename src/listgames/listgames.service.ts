@@ -63,13 +63,21 @@ export class ListgamesService implements OnModuleInit {
       );
 
       if (game.game !== null) {
-        listgames.gamesIds.push(game.game.id);
+        if (!listgames.gamesIds.includes(game.game.id)) {
+          listgames.gamesIds.push(game.game.id);
+        } else {
+          console.log(
+            `Game with id ${game.game.id} already exists in the list.`,
+          );
+        }
       } else {
         allOperationsSuccessful = false;
         failedGameId = gameId;
         break;
       }
     }
+
+    await this.repository.save(listgames); // Save the updated listgames object
 
     if (allOperationsSuccessful) {
       return {
