@@ -9,7 +9,6 @@ export interface CreateListGamesRequest {
   name: string;
   gameIds: number[];
   userId: number;
-  token: string;
 }
 
 export interface CreateListGamesResponse {

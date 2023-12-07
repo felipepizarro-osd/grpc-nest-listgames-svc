@@ -18,10 +18,11 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "proto:install": "npm i git+https://github.com/felipepizarro-osd/grpc-nest-proto.git",
+    "proto:install": "npm i git+https://github.com/felipepizarro-osd/grpc-nest-proto.git#diego-branch",
     "proto:listgames": "protoc --plugin=node_modules/.bin/protoc-gen-ts_proto.cmd -I=./node_modules/grpc-nest-proto/proto --ts_proto_out=src/listgames/proto/ node_modules/grpc-nest-proto/proto/listgames.proto --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb",
     "proto:games": "protoc --plugin=node_modules/.bin/protoc-gen-ts_proto.cmd -I=./node_modules/grpc-nest-proto/proto --ts_proto_out=src/listgames/proto/ node_modules/grpc-nest-proto/proto/games.proto --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb",
-    "proto:all": "npm run proto:listgames && npm run proto:games"
+    "proto:auth": "protoc --plugin=node_modules/.bin/protoc-gen-ts_proto.cmd -I=./node_modules/grpc-nest-proto/proto --ts_proto_out=src/listgames/proto/ node_modules/grpc-nest-proto/proto/auth.proto --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb",
+    "proto:all": "npm run proto:listgames && npm run proto:games && npm run proto:auth"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.9.11",
@@ -33,7 +34,7 @@
     "@nestjs/typeorm": "^10.0.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
-    "grpc-nest-proto": "github:felipepizarro-osd/grpc-nest-proto",
+    "grpc-nest-proto": "github:felipepizarro-osd/grpc-nest-proto#diego-branch",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",

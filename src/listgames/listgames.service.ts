@@ -16,12 +16,22 @@ import {
   DeleteGameFromListResponse,
   GetGamesInListResponse,
 } from './proto/listgames.pb';
+import { 
+  AUTH_SERVICE_NAME,
+  AuthServiceClient,
+  ValidateIdResponse,
+  
+} from './proto/auth.pb'
+
 @Injectable()
 export class ListgamesService implements OnModuleInit {
   private gamesService: GamesServiceClient;
+  private authService: AuthServiceClient;
 
   @Inject(GAMES_SERVICE_NAME)
   private readonly client: ClientGrpc;
+
+  @Inject(AUTH_SERVICE_NAME) private readonly authClient: ClientGrpc;
 
   @InjectRepository(Listgames)
   private readonly repository: Repository<Listgames>;
@@ -29,21 +39,42 @@ export class ListgamesService implements OnModuleInit {
   public onModuleInit() {
     this.gamesService =
       this.client.getService<GamesServiceClient>(GAMES_SERVICE_NAME);
+      this.authService = this.authClient.getService<AuthServiceClient>(AUTH_SERVICE_NAME);
   }
-  public async createListGames(
-    data: CreateListGamesRequest,
-  ): Promise<CreateListGamesResponse> {
-    console.log(data);
-    const listgames: Listgames = new Listgames();
-    listgames.name = data.name;
-    listgames.gamesIds = data.gameIds;
-    listgames.userId = data.userId;
-    await this.repository.save(listgames);
-    return {
-      status: HttpStatus.OK,
-      error: [],
-      listId: listgames.id,
-    };
+
+  public async createListGames(data: CreateListGamesRequest): Promise<CreateListGamesResponse> {
+    try {
+      const validationResult: ValidateIdResponse = await firstValueFrom(
+        this.authService.validateId({ userId: data.userId })
+      );
+  
+      if (validationResult.status !== HttpStatus.OK) {
+        return {
+          status: validationResult.status,
+          error: [`User with id ${data.userId} not found.`],
+          listId: null,
+        };
+      }
+//      console.log(data);
+      const listgames: Listgames = new Listgames();
+      listgames.name = data.name;
+      listgames.gamesIds = data.gameIds;
+      listgames.userId = data.userId;
+      await this.repository.save(listgames);
+
+      return {
+        status: HttpStatus.OK,
+        error: [],
+        listId: listgames.id,
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: [`Internal server error`],
+        listId: null,
+      };
+    }
   }
   //add a game to a list
   public async addGameToList(

@@ -12,8 +12,6 @@ export class ListGamesRequestDto implements CreateListGamesRequest {
   public name: string;
   @IsNumber({}, { each: true })
   public gameIds: number[];
-  @IsString()
-  public token: string;
 }
 export class AddGamesToListRequestDto implements AddGamesToListRequest {
   @IsNumber()
