@@ -43,39 +43,43 @@ export class ListgamesService implements OnModuleInit {
   }
 
   public async createListGames(data: CreateListGamesRequest): Promise<CreateListGamesResponse> {
-    try {
-      const validationResult: ValidateIdResponse = await firstValueFrom(
-        this.authService.validateId({ userId: data.userId })
-      );
-  
-      if (validationResult.status !== HttpStatus.OK) {
-        return {
-          status: validationResult.status,
-          error: [`User with id ${data.userId} not found.`],
-          listId: null,
-        };
-      }
-//      console.log(data);
-      const listgames: Listgames = new Listgames();
-      listgames.name = data.name;
-      listgames.gamesIds = data.gameIds;
-      listgames.userId = data.userId;
-      await this.repository.save(listgames);
-
+    const validationResult: ValidateIdResponse = await firstValueFrom(
+      this.authService.validateId({ userId: data.userId })
+    );
+    if (validationResult.status !== HttpStatus.OK) {
       return {
-        status: HttpStatus.OK,
-        error: [],
-        listId: listgames.id,
-      };
-    } catch (error) {
-      console.error(error);
-      return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        error: [`Internal server error`],
+        status: validationResult.status,
+        error: [`User with id ${data.userId} not found.`],
         listId: null,
       };
     }
+    // Validate each gameId
+    for (const gameId of data.gameIds) {
+      const game: GetGameResponse = await firstValueFrom(
+        this.gamesService.getGame({ id: gameId }),
+      );
+      // Check if the game exists
+      if (game.status !== HttpStatus.OK || game.game === null) {
+        return {
+          status: HttpStatus.NOT_FOUND,
+          error: [`Game with id ${gameId} not found`],
+          listId: null,
+        };
+      }
+    }
+    // All gameIds are valid, proceed with creating the list
+    const listgames: Listgames = new Listgames();
+    listgames.name = data.name;
+    listgames.gamesIds = data.gameIds;
+    listgames.userId = data.userId;
+    await this.repository.save(listgames);
+    return {
+      status: HttpStatus.OK,
+      error: [],
+      listId: listgames.id,
+    };
   }
+  
   //add a game to a list
   public async addGameToList(
     listId: number,
